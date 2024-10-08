@@ -1,0 +1,269 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <title>Simulação do Problema Monty Hall</title>
+
+
+    <style>
+        body {
+            font-family: Arial, sans-serif;
+            text-align: center;
+            padding: 50px;
+        }
+                /* Estilo para a caixa de instruções */
+        .instruction-box {
+            border: 2px solid #000;
+            padding: 20px;
+            max-width: 600px;
+            margin: 20px auto; /* Alinha a caixa ao centro da página */
+            background-color: #f9f9f9;
+            text-align: left;
+        }
+
+        .instruction-box h2 {
+            text-align: center;
+        }
+
+        .door {
+            display: inline-block;
+            margin: 20px;
+            padding: 30px;
+            background-color: brown;
+            border: 2px solid black;
+            cursor: pointer;
+            width: 120px;
+            height: 200px;
+            position: relative;
+        }
+
+        .door img {
+            width: 100%;
+            height: auto;
+            display: none;
+        }
+
+        .door.selected {
+            background-color: yellow;
+        }
+
+        .door.revealed img {
+            display: block;
+        }
+        .door.disabled {
+            /* background-color: gray; */
+            opacity: 1;
+        }
+
+        #result {
+            margin-top: 30px;
+            font-size: 20px;
+            font-weight: bold;
+        }
+
+        #switchBtn, #stayBtn, #resetBtn, #confirmBtn, #cancelBtn {
+            display: none;
+            margin-top: 20px;
+        }
+
+    </style>
+</head>
+<body>
+    <h1>Simulação do Problema Monty Hall</h1>
+    <p>Escolha uma porta e veja se você ganha o prêmio!</p>
+        <!-- instrucoes de utilizacao -->
+    <div class="instruction-box">   
+        <h2>Instruções de Utilização</h2>
+        <div>Este é um jogo baseado no problema Monty Hall, que é um problema matemático e paradoxo que surgiu a partir de um concurso televisivo dos Estados Unidos chamado Let's Make a Deal, exibido na década de 1970.</div>
+        <div>Nele, o participante tem que escolher uma entre três portas. Atrás de uma delas está um prêmio (geralmente um carro) e, atrás das outras duas, bodes. Após a escolha, o apresentador, que sabe o que está atrás de cada porta, abre uma das que o participante não escolheu, revelando um bode. Então, o participante tem a opção de mudar de porta ou permanecer com a escolha inicial.</div>
+        <div>Este jogo simula o problema Monty Hall. Para jogar, siga as instruções abaixo:</div>
+        <ol>
+            <li>Escolha uma das três portas clicando sobre ela, caso queira mudar antes de prosseguir o jogo escolha "Quero escolher outra porta" </li>
+            <li>Após escolher a porta, você será questionado se deseja manter a escolha ou mudar de porta.</li>
+            <li>Se desejar mudar de porta, clique no botão "Mudar de Porta".</li>
+            <li>Se desejar manter a porta escolhida, clique no botão "Ficar com a Escolha".</li>
+            <li>Após a escolha, será revelado se você ganhou o prêmio ou não.</li>
+            <li>Para jogar novamente, clique no botão "Reiniciar Simulação".</li>
+        </ol>
+    </div>
+      
+
+    <div id="doors">
+        <div class="door" id="door1" onclick="chooseDoor(1)">
+            Porta 1
+            <img src="https://images.pexels.com/photos/16013196/pexels-photo-16013196/free-photo-of-animal-bicho-fofo-bonitinho.jpeg?auto=compress&cs=tinysrgb&w=1260&h=750&dpr=1" id="img1" alt="Bode">
+        </div>
+        <div class="door" id="door2" onclick="chooseDoor(2)">
+            Porta 2
+            <img src="https://images.pexels.com/photos/16013196/pexels-photo-16013196/free-photo-of-animal-bicho-fofo-bonitinho.jpeg?auto=compress&cs=tinysrgb&w=1260&h=750&dpr=1" id="img2" alt="Bode">
+        </div>
+        <div class="door" id="door3" onclick="chooseDoor(3)">
+            Porta 3
+            <img src="https://images.pexels.com/photos/16013196/pexels-photo-16013196/free-photo-of-animal-bicho-fofo-bonitinho.jpeg?auto=compress&cs=tinysrgb&w=1260&h=750&dpr=1" id="img3" alt="Bode">
+        </div>
+    </div>
+    
+    <p id="question"> </p>
+    <button id="confirmBtn" onclick="confirmChoice()">Tenho Certeza</button>
+    <button id="cancelBtn" onclick="askToSwitch()">Quero escolher outra porta</button>
+    <button id="switchBtn" onclick="switchDoor()">Mudar de Porta</button>
+    <button id="stayBtn" onclick="stay()">Ficar com a Escolha</button>
+    <button id="resetBtn" onclick="resetGame()">Reiniciar Simulação</button>
+
+    <div id="result"></div>
+
+    <script>
+        let prizeDoor = Math.floor(Math.random() * 3) + 1;
+        let selectedDoor = null;
+        let revealedDoor = null;
+        let gameEnded = false;
+
+        function chooseDoor(door) {
+            if (gameEnded) return;
+
+            // Selecione a porta
+            selectedDoor = door;
+            document.getElementById("door1").classList.remove("selected");
+            document.getElementById("door2").classList.remove("selected");
+            document.getElementById("door3").classList.remove("selected");
+            document.getElementById("door" + door).classList.add("selected");
+            
+            // Pergunta se tem certeza
+            document.getElementById("confirmBtn").style.display = "inline-block";
+            document.getElementById("cancelBtn").style.display = "inline-block";
+            document.getElementById("question").innerText = "Você tem certeza de que deseja manter a porta escolhida?";
+        }
+
+        function confirmChoice() {
+            // Confirma a escolha e revela uma porta com o bode
+            disableDoors();
+            revealGoat();
+            
+            // Oculta botões de confirmação e habilita os botões de mudar ou manter
+            document.getElementById("confirmBtn").style.display = "none";
+            document.getElementById("cancelBtn").style.display = "none";
+            document.getElementById("switchBtn").style.display = "inline-block";
+            document.getElementById("stayBtn").style.display = "inline-block";
+            document.getElementById("question").innerText = "Sabendo que a porta " + revealedDoor + " contém um bode, deseja mudar de porta ou manter a escolhida?";
+        }
+
+        function askToSwitch() {
+            // Permite o jogador mudar de porta antes de revelar o bode
+            document.getElementById("question").innerText = "Escolha uma nova porta!";
+            disableDoors();
+            
+            // Habilita a seleção de nova porta
+            enableDoors();
+        }
+
+        function switchDoor() {
+            if (gameEnded) return;
+
+            document.getElementById("door" + selectedDoor).classList.remove("selected");
+            // Troca a porta selecionada
+            selectedDoor = [1, 2, 3].find(d => d !== selectedDoor && d !== revealedDoor);
+            
+            // troocar cor da porta selecionada
+            document.getElementById("door" + selectedDoor).classList.add("selected");
+            
+
+            // Verifica se ganhou
+            checkResult();
+        }
+
+        function stay() {
+            if (gameEnded) return;
+
+            // Mantém a porta escolhida
+            checkResult();
+        }
+
+        function revealGoat() {
+            // Revela uma porta que não contenha o prêmio e que não seja a escolhida
+            
+            revealedDoor = [1, 2, 3].find(d => d !== prizeDoor && d !== selectedDoor);
+            document.getElementById("door" + revealedDoor).classList.add("revealed");
+            document.getElementById("img" + revealedDoor).style.display = "block";
+            document.getElementById("img" + revealedDoor).src = "https://images.pexels.com/photos/16013196/pexels-photo-16013196/free-photo-of-animal-bicho-fofo-bonitinho.jpeg?auto=compress&cs=tinysrgb&w=1260&h=750&dpr=1";  // Revela o bode
+        }
+
+        function checkResult() {
+            gameEnded = true;
+
+            // Desabilita os botões
+            document.getElementById("switchBtn").style.display = "none";
+            document.getElementById("stayBtn").style.display = "none";
+            document.getElementById("question").innerText = "";
+
+            // Revela todas as portas
+            revealAllDoors();
+
+            // Exibe o resultado
+            if (selectedDoor === prizeDoor) {
+                document.getElementById("result").innerText = "Parabéns! Você ganhou um carro!";
+            } else {
+                document.getElementById("result").innerText = "Que pena! Você encontrou um bode!";
+            }
+
+            // Exibe o botão de reset
+            document.getElementById("resetBtn").style.display = "block";
+
+        }
+
+        function revealAllDoors() {
+            // Revela todas as portas mostrando onde estão os bodes e o carro
+            for (let i = 1; i <= 3; i++) {
+                document.getElementById("door" + i).classList.add("revealed");
+                document.getElementById("img" + i).src = i === prizeDoor ? "https://img.freepik.com/fotos-premium/tiro-vertical-da-frente-de-um-carro-esportivo-vermelho-com-o-por-do-sol-ao-fundo-e-espaco-de-copia_142883-3372.jpg" : "https://images.pexels.com/photos/16013196/pexels-photo-16013196/free-photo-of-animal-bicho-fofo-bonitinho.jpeg?auto=compress&cs=tinysrgb&w=1260&h=750&dpr=1";
+                document.getElementById("img" + i).style.display = "block";
+            }
+        }
+
+        function disableDoors() {
+            // Desabilita as portas para impedir novos cliques
+            document.getElementById("door1").classList.add("disabled");
+            document.getElementById("door2").classList.add("disabled");
+            document.getElementById("door3").classList.add("disabled");
+        }
+
+        function enableDoors() {
+            // Habilita as portas novamente para nova escolha
+            document.getElementById("door1").classList.remove("disabled");
+            document.getElementById("door2").classList.remove("disabled");
+            document.getElementById("door3").classList.remove("disabled");
+        }
+
+        function resetGame() {
+  
+            // Reinicia o estado do jogo
+            prizeDoor = Math.floor(Math.random() * 3) + 1;
+            selectedDoor = null;
+            revealedDoor = null;
+            gameEnded = false;
+
+            // Remove as seleções e revelações
+            document.getElementById("door1").classList.remove("selected", "revealed", "disabled");
+            document.getElementById("door2").classList.remove("selected", "revealed", "disabled");
+            document.getElementById("door3").classList.remove("selected", "revealed", "disabled");
+            
+            document.getElementById("img1").style.display = "none";
+            document.getElementById("img2").style.display = "none";
+            document.getElementById("img3").style.display = "none";
+            // Mostra as imagens novamente
+            // document.getElementById("img1").style.display = "block";
+            // document.getElementById("img2").style.display = "block";
+            // document.getElementById("img3").style.display = "block";
+
+            document.getElementById("result").innerText = "";
+            document.getElementById("confirmBtn").style.display = "none";
+            document.getElementById("cancelBtn").style.display = "none";
+            document.getElementById("switchBtn").style.display = "none";
+            document.getElementById("stayBtn").style.display = "none";
+            document.getElementById("resetBtn").style.display = "none";
+
+
+        }
+    </script>
+</body>
+</html>
