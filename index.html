@@ -80,7 +80,7 @@
         <div>Este jogo simula o problema Monty Hall. Para jogar, siga as instruções abaixo:</div>
         <ol>
             <li>Escolha uma das três portas clicando sobre ela, caso queira mudar antes de prosseguir o jogo escolha "Quero escolher outra porta" </li>
-            <li>Após escolher a porta, você será questionado se deseja manter a escolha ou mudar de porta.</li>
+            <li>Após escolher a porta, o apresentador irá mostra outra porta não escolhida a qual contém um dos bodes e você será questionado se deseja manter a escolha ou mudar de porta.</li>
             <li>Se desejar mudar de porta, clique no botão "Mudar de Porta".</li>
             <li>Se desejar manter a porta escolhida, clique no botão "Ficar com a Escolha".</li>
             <li>Após a escolha, será revelado se você ganhou o prêmio ou não.</li>
@@ -145,7 +145,7 @@
             document.getElementById("cancelBtn").style.display = "none";
             document.getElementById("switchBtn").style.display = "inline-block";
             document.getElementById("stayBtn").style.display = "inline-block";
-            document.getElementById("question").innerText = "Sabendo que a porta " + revealedDoor + " contém um bode, deseja mudar de porta ou manter a escolhida?";
+            document.getElementById("question").innerText = "Sabendo o apresentador revelou que a porta " + revealedDoor + " contém um bode, deseja mudar de porta ou manter a escolhida?";
         }
 
         function askToSwitch() {
